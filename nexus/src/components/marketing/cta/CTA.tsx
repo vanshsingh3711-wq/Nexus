@@ -4,7 +4,7 @@ import React from 'react';
 import { ArrowRight, Star } from 'lucide-react';
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
-
+import Image from "next/image";
 export default function BottomCTA() {
   return (
     <section className="py-20 md:py-28 px-6 bg-[#030303]">
@@ -59,9 +59,14 @@ export default function BottomCTA() {
             {/* Right Graphic – sleek abstract Nexus mark */}
             <div className="relative flex-shrink-0">
               <div className="w-40 h-40 md:w-48 md:h-48 rounded-3xl bg-gradient-to-br from-[#6C5CE7]/20 to-[#A78BFA]/10 border border-[#6C5CE7]/20 backdrop-blur-md shadow-[0_0_40px_rgba(108,92,231,0.2)] flex items-center justify-center relative">
-                <span className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-[#A1A1AA]">
-                  N
-                </span>
+                <div>
+                  <Image
+                    src="/assets/gemini-svg.svg"
+                    alt="Gemini Logo"
+                    width={500}
+                    height={500}
+                  />
+                </div>
                 {/* Subtle rotating accent ring */}
                 <div className="absolute inset-0 rounded-3xl border border-[#6C5CE7]/10 animate-[spin_20s_linear_infinite] pointer-events-none" />
               </div>

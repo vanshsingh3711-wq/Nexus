@@ -1,13 +1,14 @@
 import Image from "next/image";
-import Navbar from "@/components/marketing/Navbar";
-import Hero from "@/components/marketing/Hero";
-import Integrations from "@/components/marketing/Integrations";
-import Workflow from "@/components/marketing/Workflow";
-import Features from "@/components/marketing/Features";
-import ScaleSection from "@/components/marketing/ScaleSection";
-import Testimonials from "@/components/marketing/Testimonials";
-import CTA from "@/components/marketing/CTA";
-import Footer from "@/components/marketing/Footer";
+import Navbar from "@/components/marketing/navbar/Navbar";
+import Hero from "@/components/marketing/hero/Hero";
+import Integrations from "@/components/marketing/integrations/Integrations";
+import Workflow from "@/components/marketing/workflow/Workflow";
+import Features from "@/components/marketing/features/Features";
+import ScaleSection from "@/components/marketing/scaleselection/ScaleSection";
+import Testimonials from "@/components/marketing/testimonials/Testimonials";
+import CTA from "@/components/marketing/cta/CTA";
+import Footer from "@/components/marketing/footer/Footer";
+import Problems from "@/components/marketing/problems/Problems";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
       <Integrations/>
       <Workflow/>
       <Features/>
+      <Problems/>
       <ScaleSection/>
       <Testimonials/>
       <CTA/>

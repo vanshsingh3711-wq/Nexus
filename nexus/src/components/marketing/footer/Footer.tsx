@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-
+import Image from "next/image"
 
 const footerLinks = [
   {
@@ -29,14 +29,17 @@ export default function Footer() {
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           {/* Brand column */}
-          <div className="col-span-2 md:col-span-1">
+          <div className="col-span-2 md:col-span-1 ml-0">
             <Link href="/" className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-[#6C5CE7] to-[#A78BFA] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">N</span>
-              </div>
-              <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#FAFAFA] via-[#E4E4E7] to-[#A1A1AA] bg-clip-text text-transparent">
-                NEXUS
-              </span>
+              
+             <div>
+              <Image
+                              src="/assets/gemini-svg.svg"
+                              alt="Nexus Logo"
+                              width={70}
+                              height={70}
+                            />
+             </div>
             </Link>
             <p className="text-sm text-[#A1A1AA] mb-6 max-w-[200px] leading-relaxed">
               The AI Operating System for Developers.

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ArrowRight, Menu, X } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
-
+import Image from "next/image";
 const navLinks = [
   { label: 'Product', href: '#product' },
   { label: 'Use Cases', href: '#use-cases' },
@@ -33,22 +33,27 @@ export default function Navbar() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
-          scrolled
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${scrolled
             ? 'bg-[#030303]/80 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.4)]'
             : 'bg-transparent border-b border-transparent'
-        }`}
+          }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 h-[72px] flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative w-8 h-8 flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#6C5CE7] to-[#A78BFA] rounded-lg opacity-80 group-hover:opacity-100 transition-opacity" />
+              <div  />
               <motion.div
                 className="absolute inset-0 rounded-lg bg-[#6C5CE7] opacity-0 group-hover:opacity-40 blur-md transition-opacity"
                 animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               />
-              <span className="relative text-white font-bold text-lg">N</span>
+              <div>
+                <Image
+                src="/assets/gemini-svg.svg"
+                alt="Nexus Logo"
+                width={70}
+                height={70}
+              /></div>
             </div>
             <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#FAFAFA] via-[#E4E4E7] to-[#A1A1AA] bg-clip-text text-transparent">
               NEXUS
