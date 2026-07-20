@@ -61,8 +61,8 @@ export default function BottomCTA() {
               <div className="w-40 h-40 md:w-48 md:h-48 rounded-3xl bg-gradient-to-br from-[#6C5CE7]/20 to-[#A78BFA]/10 border border-[#6C5CE7]/20 backdrop-blur-md shadow-[0_0_40px_rgba(108,92,231,0.2)] flex items-center justify-center relative">
                 <div>
                   <Image
-                    src="/assets/gemini-svg.svg"
-                    alt="Gemini Logo"
+                    src="/assets/logo.svg"
+                    alt="Nexus Logo"
                     width={500}
                     height={500}
                   />

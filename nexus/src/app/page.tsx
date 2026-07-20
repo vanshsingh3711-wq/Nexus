@@ -13,6 +13,7 @@ import Problems from "@/components/marketing/problems/Problems";
 export default function Home() {
   return (
     <>
+    
       <Navbar />
       <Hero/>
       <Integrations/>

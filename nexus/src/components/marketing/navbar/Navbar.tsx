@@ -49,10 +49,10 @@ export default function Navbar() {
               />
               <div>
                 <Image
-                src="/assets/gemini-svg.svg"
+                src="/assets/logo.svg"
                 alt="Nexus Logo"
-                width={70}
-                height={70}
+                width={90}
+                height={90}
               /></div>
             </div>
             <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#FAFAFA] via-[#E4E4E7] to-[#A1A1AA] bg-clip-text text-transparent">
