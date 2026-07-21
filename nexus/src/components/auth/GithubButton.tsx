@@ -2,19 +2,26 @@
 
 import { Button } from "@/components/ui/button";
 import { SiGithub } from "react-icons/si";
+import { authClient } from "@/lib/auth-client";
+
+
 
 interface GithubButtonProps {
-  onClick?: () => void;
+  
   isLoading?: boolean;
 }
 
 export function GithubButton({
-  onClick,
+  
   isLoading = false,
 }: GithubButtonProps) {
+
+  async function handleGithubLogin(){
+    await authClient.signIn.social({provider:"github"})
+  }
   return (
     <Button
-      onClick={onClick}
+      onClick={handleGithubLogin}
       disabled={isLoading}
       size="lg"
       className="w-full h-12 rounded-xl text-base font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
