@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { SiGithub } from "react-icons/si";
 import { authClient } from "@/lib/auth-client";
-
+import { useState } from "react";
 
 
 interface GithubButtonProps {
@@ -11,17 +11,27 @@ interface GithubButtonProps {
   isLoading?: boolean;
 }
 
-export function GithubButton({
-  
-  isLoading = false,
-}: GithubButtonProps) {
+export function GithubButton(){
 
-  async function handleGithubLogin(){
-    await authClient.signIn.social({provider:"github"})
-  }
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  async function login(){
+    try{
+      setIsLoading(true)
+     const result=  await authClient.signIn.social({provider:"github"});
+     console.log(result);
+
+    }
+    catch(error){
+      
+      console.error(error);
+    }
+  };
+  
   return (
     <Button
-      onClick={handleGithubLogin}
+      onClick={login}
       disabled={isLoading}
       size="lg"
       className="w-full h-12 rounded-xl text-base font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
