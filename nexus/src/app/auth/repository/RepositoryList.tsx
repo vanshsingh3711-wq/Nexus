@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Search,  Lock, Globe } from "lucide-react";
+import { Search, Lock, Globe } from "lucide-react";
 import { SiGithub } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+
 
 
 
@@ -23,11 +24,46 @@ type Githubrepositories = {
 };
 
 export default function RepositoryList(
-  {repositories}:{repositories :Githubrepositories[]
+  { repositories }: {
+    repositories: Githubrepositories[]
 
   }
 ) {
+
+  const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState<number[]>([]);
+  const [query, setQuery] = useState("");
+  async function saveRepositories() {
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/repositories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          repositories: repositories.filter(repo =>
+            selected.includes(repo.id)
+          )
+        })
+      });
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error("Failed to import repositories");
+      }
+
+      console.log("Imported successfully");
+
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
 
   function toggleRepo(id: number) {
     setSelected((prev) =>
@@ -36,7 +72,18 @@ export default function RepositoryList(
         : [...prev, id]
     );
   }
-console.log(repositories);
+
+  const filteredRepositories = repositories.filter((repo) => {
+    const search = query.toLowerCase();
+
+    return (
+      repo.name.toLowerCase().includes(search) ||
+      repo.description?.toLowerCase().includes(search)
+    );
+  });
+
+
+  console.log(repositories);
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-5xl px-6 py-12">
@@ -52,11 +99,13 @@ console.log(repositories);
           <Input
             className="pl-10"
             placeholder="Search repositories..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
           />
         </div>
 
         <div className="space-y-4 ">
-          {repositories?.map((repo) => (
+          {filteredRepositories?.map((repo) => (
             <Card
               key={repo.id}
               className="flex  justify-between p-5"
@@ -91,7 +140,7 @@ console.log(repositories);
 
                     <span>•</span>
 
-                    <span>Updated {repo.updatedAt}</span>
+                    <span>Updated {new Date(repo.updatedAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
@@ -104,8 +153,8 @@ console.log(repositories);
             {selected.length} repositories selected
           </p>
 
-          <Button disabled={selected.length === 0}>
-            Import Selected
+          <Button disabled={selected.length === 0 || loading} onClick={saveRepositories}>
+            {loading ? "Importing..." : "Import Selected"}
           </Button>
         </div>
       </div>
