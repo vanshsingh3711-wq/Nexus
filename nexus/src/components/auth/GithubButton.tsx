@@ -17,9 +17,14 @@ export function GithubButton(){
 
 
   async function login(){
+    
     try{
       setIsLoading(true)
-     const result=  await authClient.signIn.social({provider:"github"});
+     const result=  await authClient.signIn.social({
+      provider:"github",
+      callbackURL : "/auth/repositories"
+    
+    });
      console.log(result);
 
     }
