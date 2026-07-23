@@ -1,9 +1,9 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { GitHubApiRepository } from "@/types/gtihubapirepository";
+import { GithubRepository } from "@/types/repository";
 
 
-export async function getRepositories(userId: string) {
+export async function getRepositories(userId: string):Promise<GithubRepository[]> {
 
 
 
@@ -35,5 +35,14 @@ export async function getRepositories(userId: string) {
     const repositories = await response.json()
     console.log(repositories)
 
-    return repositories
+    return repositories.map((repo: GitHubApiRepository) => ({
+        githubRepositoryId: String(repo.id),
+        name: repo.name,
+        owner: repo.owner.login,
+        defaultBranch: repo.default_branch,
+        visibility: repo.private ? "PRIVATE" : "PUBLIC",
+        description: repo.description,
+        updatedAt: repo.updated_at,
+    }));
+
 }

@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -28,10 +27,11 @@ model Repository {
   id                 String               @id @default(cuid())
   userId             String
   user               User                 @relation(fields: [userId], references: [id])
-  githubRepositoryId String               @unique
+  githubRepositoryId BigInt               @unique
   name               String
   owner              String
   defaultBranch      String
+  description        String?
   visibility         RepositoryVisibility
   lastIndexedAt      DateTime?
   status             StatusRepository
@@ -51,6 +51,7 @@ enum StatusRepository {
   INDEXING
   READY
   FAILED
+  DELETED
 }
 
 model Index {
