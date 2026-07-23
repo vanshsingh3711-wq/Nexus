@@ -7,44 +7,43 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { GithubRepository } from "@/types/repository";
 
 
-
-
-type Githubrepositories = {
-  id: number;
-  name: string;
-  description: string | null;
-  language: string | null;
-  stars: number;
-  forks: number;
-  visibility: string;
-  url: string;
-  updatedAt: string;
-};
+// type Githubrepositories = {
+//   id: number;
+//   name: string;
+//   description: string | null;
+//   language: string | null;
+//   stars: number;
+//   forks: number;
+//   visibility: string;
+//   url: string;
+//   updatedAt: string;
+// };
 
 export default function RepositoryList(
   { repositories }: {
-    repositories: Githubrepositories[]
+    repositories:  GithubRepository[]
 
   }
 ) {
 
   const [loading, setLoading] = useState(false)
-  const [selected, setSelected] = useState<number[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   async function saveRepositories() {
     try {
       setLoading(true);
 
-      const response = await fetch("/api/repositories", {
+      const response = await fetch("/api/repositories/import", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
           repositories: repositories.filter(repo =>
-            selected.includes(repo.id)
+            selected.includes(repo.githubRepositoryId)
           )
         })
       });
@@ -65,7 +64,7 @@ export default function RepositoryList(
   }
 
 
-  function toggleRepo(id: number) {
+  function toggleRepo(id: string) {
     setSelected((prev) =>
       prev.includes(id)
         ? prev.filter((repo) => repo !== id)
@@ -107,13 +106,13 @@ export default function RepositoryList(
         <div className="space-y-4 ">
           {filteredRepositories?.map((repo) => (
             <Card
-              key={repo.id}
+              key={repo.githubRepositoryId}
               className="flex  justify-between p-5"
             >
               <div className=" flex items-center  gap-4 ">
                 <Checkbox
-                  checked={selected.includes(repo.id)}
-                  onCheckedChange={() => toggleRepo(repo.id)}
+                  checked={selected.includes(repo.githubRepositoryId)}
+                  onCheckedChange={() => toggleRepo(repo.githubRepositoryId)}
                 />
 
                 <SiGithub className="h-6 w-6" />
@@ -126,7 +125,7 @@ export default function RepositoryList(
                   </p>
 
                   <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                    {repo.visibility === 'Private' ? (
+                    {repo.visibility === "PRIVATE" ? (
                       <>
                         <Lock className="h-3 w-3" />
                         Private
@@ -140,7 +139,7 @@ export default function RepositoryList(
 
                     <span>•</span>
 
-                    <span>Updated {new Date(repo.updatedAt).toLocaleDateString()}</span>
+                    <span>Updated {new Date(repo.updatedAt).toLocaleDateString("en-US")}</span>
                   </div>
                 </div>
               </div>
