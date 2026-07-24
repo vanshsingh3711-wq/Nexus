@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 
 // Custom easing for buttery-smooth entries
-const SMOOTH_EASE = [0.16, 1, 0.3, 1];
+const SMOOTH_EASE : [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 // Node configuration with varied float durations for organic movement
 const NETWORK_NODES = [

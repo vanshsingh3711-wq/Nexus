@@ -25,8 +25,10 @@ import { GithubRepository } from "@/types/repository";
 export default function RepositoryList(
   { repositories }: {
     repositories:  GithubRepository[]
+    
 
   }
+  
 ) {
 
   const [loading, setLoading] = useState(false)
