@@ -1,5 +1,5 @@
 export type Repository = {
-  githubRepositoryId: string;
+  githubRepositoryId: number;
   name: string;
   owner: string;
   defaultBranch: string;
