@@ -1,3 +1,5 @@
+<img width="945" height="534" alt="image" src="https://github.com/user-attachments/assets/dd686992-7bfd-4735-b79b-50ba86dec250" />
+
 # Nexus
 AI Software Intelligence Platform that helps developers understand, navigate, and evolve complex codebases.
 
