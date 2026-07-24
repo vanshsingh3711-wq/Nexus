@@ -34,7 +34,7 @@ export default function Footer() {
               
              <div>
               <Image
-                              src="/assets/gemini-svg.svg"
+                              src="/assets/logo.svg"
                               alt="Nexus Logo"
                               width={70}
                               height={70}
