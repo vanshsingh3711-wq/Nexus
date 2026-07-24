@@ -10,29 +10,17 @@ import { Input } from "@/components/ui/input";
 import { GithubRepository } from "@/types/repository";
 
 
-// type Githubrepositories = {
-//   id: number;
-//   name: string;
-//   description: string | null;
-//   language: string | null;
-//   stars: number;
-//   forks: number;
-//   visibility: string;
-//   url: string;
-//   updatedAt: string;
-// };
 
 export default function RepositoryList(
   { repositories }: {
     repositories:  GithubRepository[]
-    
 
   }
   
 ) {
 
   const [loading, setLoading] = useState(false)
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<Number[]>([]);
   const [query, setQuery] = useState("");
   async function saveRepositories() {
     try {
@@ -66,7 +54,7 @@ export default function RepositoryList(
   }
 
 
-  function toggleRepo(id: string) {
+  function toggleRepo(id: Number) {
     setSelected((prev) =>
       prev.includes(id)
         ? prev.filter((repo) => repo !== id)

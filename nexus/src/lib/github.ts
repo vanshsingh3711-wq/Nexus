@@ -36,7 +36,7 @@ export async function getRepositories(userId: string):Promise<GithubRepository[]
     console.log(repositories)
 
     return repositories.map((repo: GitHubApiRepository) => ({
-        githubRepositoryId: String(repo.id),
+        githubRepositoryId: (repo.id),
         name: repo.name,
         owner: repo.owner.login,
         defaultBranch: repo.default_branch,
