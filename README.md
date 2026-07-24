@@ -1,6 +1,6 @@
 <img width="945" height="534" alt="image" src="https://github.com/user-attachments/assets/dd686992-7bfd-4735-b79b-50ba86dec250" />
 
-Link : "https://nexus-qgg99x01c-clinic-flow-ai1.vercel.app/"
+Link : "https://nexus-iota-liart.vercel.app/"
 
 # Nexus
 AI Software Intelligence Platform that helps developers understand, navigate, and evolve complex codebases.
