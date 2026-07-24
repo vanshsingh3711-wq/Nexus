@@ -22,7 +22,7 @@ export function GithubButton(){
       setIsLoading(true)
      const result=  await authClient.signIn.social({
       provider:"github",
-      callbackURL : "//auth/repository"
+      callbackURL : "/auth/repositories"
     
     });
      console.log(result);
