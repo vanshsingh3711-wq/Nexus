@@ -14,13 +14,12 @@ import { GithubRepository } from "@/types/repository";
 export default function RepositoryList(
   { repositories }: {
     repositories:  GithubRepository[]
-
   }
   
 ) {
 
   const [loading, setLoading] = useState(false)
-  const [selected, setSelected] = useState<Number[]>([]);
+  const [selected, setSelected] = useState<number[]>([]);
   const [query, setQuery] = useState("");
   async function saveRepositories() {
     try {
@@ -54,7 +53,7 @@ export default function RepositoryList(
   }
 
 
-  function toggleRepo(id: Number) {
+  function toggleRepo(id: number) {
     setSelected((prev) =>
       prev.includes(id)
         ? prev.filter((repo) => repo !== id)
