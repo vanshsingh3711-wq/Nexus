@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ArrowRight, Menu, X } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
+
 const navLinks = [
   { label: 'Product', href: '#product' },
   { label: 'Use Cases', href: '#use-cases' },
@@ -18,6 +20,15 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const router = useRouter();
+
+  function handleClick() {
+    router.push("/auth/login");
+  }
+
+
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,14 +45,14 @@ export default function Navbar() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${scrolled
-            ? 'bg-[#030303]/80 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.4)]'
-            : 'bg-transparent border-b border-transparent'
+          ? 'bg-[#030303]/80 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.4)]'
+          : 'bg-transparent border-b border-transparent'
           }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 h-[72px] flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative w-8 h-8 flex items-center justify-center">
-              <div  />
+              <div />
               <motion.div
                 className="absolute inset-0 rounded-lg bg-[#6C5CE7] opacity-0 group-hover:opacity-40 blur-md transition-opacity"
                 animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
@@ -49,11 +60,11 @@ export default function Navbar() {
               />
               <div>
                 <Image
-                src="/assets/logo.svg"
-                alt="Nexus Logo"
-                width={90}
-                height={90}
-              /></div>
+                  src="/assets/logo.svg"
+                  alt="Nexus Logo"
+                  width={90}
+                  height={90}
+                /></div>
             </div>
             <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#FAFAFA] via-[#E4E4E7] to-[#A1A1AA] bg-clip-text text-transparent">
               NEXUS
@@ -84,8 +95,8 @@ export default function Navbar() {
               2.3k
             </a>
 
-            <Link
-              href="/get-started"
+            <button
+              onClick={handleClick }
               className={buttonVariants({
                 className:
                   'hidden sm:inline-flex items-center gap-2 bg-gradient-to-r from-[#6C5CE7] to-[#8B5CF6] hover:from-[#7C6DF0] hover:to-[#9B6CF9] text-white font-semibold shadow-[0_0_20px_rgba(108,92,231,0.4)] hover:shadow-[0_0_30px_rgba(108,92,231,0.6)] transition-all duration-300 rounded-lg px-5 py-2.5 h-auto',
@@ -93,7 +104,7 @@ export default function Navbar() {
             >
               Get Started Free
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
 
             <button
               className="md:hidden p-2 text-[#A1A1AA] hover:text-white transition-colors"
@@ -141,15 +152,17 @@ export default function Navbar() {
                   href="https://github.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => setMobileOpen(false)}
+                  onClick={() =>
+
+                    setMobileOpen(false)}
                   className="flex items-center gap-2 px-4 py-3 rounded-xl border border-white/[0.08] bg-white/[0.02] text-sm font-medium text-[#A1A1AA]"
                 >
                   <Star className="w-4 h-4" />
                   Star on GitHub (2.3k)
                 </a>
-                <Link
-                  href="/get-started"
-                  onClick={() => setMobileOpen(false)}
+                <button
+
+                  onClick={handleClick }
                   className={buttonVariants({
                     className:
                       'w-full bg-gradient-to-r from-[#6C5CE7] to-[#8B5CF6] hover:from-[#7C6DF0] hover:to-[#9B6CF9] text-white font-semibold shadow-[0_0_20px_rgba(108,92,231,0.4)] rounded-xl py-6 text-base',
@@ -157,7 +170,7 @@ export default function Navbar() {
                 >
                   Get Started Free
                   <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
+                </button>
               </div>
             </div>
           </motion.div>

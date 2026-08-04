@@ -5,7 +5,15 @@ import { ArrowRight, Star } from 'lucide-react';
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
+
+
 export default function BottomCTA() {
+  const router = useRouter();
+  
+    function handleClick() {
+      router.push("/auth/login");
+    }
   return (
     <section className="py-20 md:py-28 px-6 bg-[#030303]">
       <div className="max-w-[1200px] mx-auto">
@@ -30,8 +38,8 @@ export default function BottomCTA() {
               </p>
 
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                <Link
-                  href="/get-started"
+                <button
+                  onClick={() => handleClick()}
                   className={buttonVariants({
                     className:
                       'inline-flex items-center gap-2 bg-gradient-to-r from-[#6C5CE7] to-[#8B5CF6] hover:from-[#7C6DF0] hover:to-[#9B6CF9] text-white font-semibold shadow-[0_0_20px_rgba(108,92,231,0.4)] hover:shadow-[0_0_30px_rgba(108,92,231,0.6)] transition-all duration-300 rounded-lg px-7 py-4 h-auto text-base',
@@ -39,7 +47,7 @@ export default function BottomCTA() {
                 >
                   Get Started Free
                   <ArrowRight className="w-5 h-5" />
-                </Link>
+                </button>
                 <a
                   href="https://github.com"
                   target="_blank"
