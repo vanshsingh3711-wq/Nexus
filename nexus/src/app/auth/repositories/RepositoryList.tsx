@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { GithubRepository } from "@/types/repository";
+import { useRouter } from "next/navigation";
 
 
 
@@ -21,6 +22,7 @@ export default function RepositoryList(
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState<number[]>([]);
   const [query, setQuery] = useState("");
+  const router = useRouter();
   async function saveRepositories() {
     try {
       setLoading(true);
@@ -43,7 +45,7 @@ export default function RepositoryList(
         throw new Error("Failed to import repositories");
       }
 
-      console.log("Imported successfully");
+      router.push("/dashboard");
 
     } catch (error) {
       console.error(error);

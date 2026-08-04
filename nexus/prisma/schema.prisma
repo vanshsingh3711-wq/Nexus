@@ -5,7 +5,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  
 }
 
 model User {
@@ -40,6 +39,7 @@ model Repository {
   updatedAt          DateTime             @updatedAt
   indexingJobs       Index[]
   conversations      Conversation[]
+  chunks             CodeChunk[]
 }
 
 enum RepositoryVisibility {
@@ -56,16 +56,22 @@ enum StatusRepository {
 }
 
 model Index {
-  id             String      @id @default(cuid())
-  repository     Repository  @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
-  repositoryId   String
-  status         IndexStatus
-  startedAt      DateTime    @default(now())
-  finishedAt     DateTime?
-  commitSha      String
-  filesProcessed Int
-  error          String?
-  createdAt      DateTime    @default(now())
+  id           String     @id @default(cuid())
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repositoryId String
+
+  status IndexStatus
+
+  progress       Int     @default(0)
+  currentStep    String?
+  filesProcessed Int     @default(0)
+  totalFiles     Int     @default(0)
+
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+  commitSha  String
+  error      String?
+  createdAt  DateTime  @default(now())
 }
 
 enum IndexStatus {
@@ -147,4 +153,22 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model CodeChunk {
+  id String @id @default(cuid())
+
+  repositoryId String
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  path       String
+  content    String
+  chunkIndex Int
+  language   String
+
+  embedding Unsupported("vector")
+
+  createdAt DateTime @default(now())
+
+  @@index([repositoryId])
 }
