@@ -24,7 +24,9 @@ const LANGUAGE_MAP: Record<string, any> = {
 export async function chunkRepository(
     items: { path: string; content: string }[]
 ): Promise<DocumentChunk[]> {
-    
+     console.log("Items received:", items.length);
+  console.log(items[0]);
+
     const chunkFile: DocumentChunk[] = [];
 
     try {
