@@ -9,12 +9,21 @@ const IGNORED_DIRECTORIES = new Set([
     "build",
 ]);
 export async function walkRepository(directoryPath: string): Promise<string[]> {
-
+   console.log("Walking:", directoryPath);
     const files: string[] = [];
 
     const entries = await readdir(directoryPath, {
         withFileTypes: true,
     });
+
+        console.log("Entries:", entries.map(e => ({
+        name: e.name,
+        dir: e.isDirectory(),
+        file: e.isFile(),
+    })));
+
+
+
     for (const entry of entries) {
         if (
             entry.isDirectory() &&

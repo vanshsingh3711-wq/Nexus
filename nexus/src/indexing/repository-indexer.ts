@@ -14,57 +14,76 @@ export async function indexRepository(
   repository: Repository,
   jobId: string
 ) {
+  console.log("repository-indexer.ts loaded");
+  console.log("🚀 Indexing started:", repository.name);
+
+
   const cloneUrl = `https://github.com/${repository.owner}/${repository.name}.git`;
 
+
   let clonePath: string | undefined;
+  console.log("Repository passed to indexRepository:");
+console.log(repository);
+console.log("repository.id =", repository.id);
 
   try {
-    // Clone repository
-    clonePath = await cloneRepository(cloneUrl);
+   console.log("1 Clone");
+clonePath = await cloneRepository(cloneUrl);
 
-    await updateProgress(jobId, 10, "Repository cloned");
+console.log("2 Walk");
+const files = await walkRepository(clonePath);
 
-    // Scan files
-    const files = await walkRepository(clonePath);
 
-    await updateProgress(jobId, 25, "Scanning repository");
+console.log("Files found:", files.length);
+console.log(files.slice(0, 5));
 
-    // Read documents
-    const documents = await readRepository(files);
+console.log("3 Read");
 
-    await updateProgress(jobId, 45, "Reading documents");
+console.log("3 Read");
+const documents = await readRepository(files);
 
-    // Chunk documents
-    const chunks = await chunkRepository(documents);
 
-    await updateProgress(jobId, 65, "Chunking documents");
 
-    // Generate embeddings
-    const embeddings = await createEmbeddings(chunks);
+console.log("Documents read:", documents.length);
+console.log(documents[0]);
 
-    await updateProgress(jobId, 75, "Generating embeddings");
+console.log("4 Chunk");
+const chunks = await chunkRepository(documents);
 
-    // Store embeddings
-    await storeEmbeddings(repository.id, embeddings);
+console.log("5 Embed");
+const embeddings = await createEmbeddings(chunks);
 
-    await updateProgress(jobId, 90, "Storing embeddings");
+console.log("6 Store");
+await storeEmbeddings(repository.id, embeddings);
 
-    // Finish job
-    await markCompleted(jobId);
+console.log("7 Complete");
+await markCompleted(jobId, repository.id);
 
     return {
       files,
       documents,
       chunks,
     };
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown error";
+  }
+  
+  catch (error) {
+  console.log("Repository inside catch:");
+  console.log(repository);
+  console.log("repository.id =", repository.id);
 
-    await markFailed(jobId, message);
+  const message =
+    error instanceof Error ? error.message : "Unknown error";
 
-    throw error;
-  } finally {
+    console.log("markFailed()");
+console.log("job:", jobId);
+console.log("repository.id:", repository.id);
+
+  await markFailed(jobId, message, repository.id);
+
+  throw error;
+}
+
+finally {
     if (clonePath) {
       await fs.rm(clonePath, {
         recursive: true,
