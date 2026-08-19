@@ -4,16 +4,20 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 
 
 export const auth = betterAuth({
-    database: prismaAdapter(prisma , {
-        provider : "postgresql"
-    }),
+  trustedOrigins: [
+    "http://localhost:3000",
+    "https://nexus-4rkkcqiu-wansh-singh.vercel.app",
+  ],
 
-    socialProviders: {
-        github:{
-            clientId: process.env.GITHUB_CLIENT_ID!,
-            clientSecret : process.env.GITHUB_CLIENT_SECRET!,
-             scope: ["read:user", "user:email", "repo"],
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+  }),
 
-        }
-    }
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      scope: ["read:user", "user:email", "repo"],
+    },
+  },
 });
