@@ -109,8 +109,7 @@ model Message {
 
   conversationId String
 
-  conversation Conversation
-    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   role MessageRole
 
