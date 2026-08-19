@@ -88,8 +88,7 @@ model Conversation {
 
   repositoryId String
 
-  repository Repository
-    @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
 
   messages Message[]
 
