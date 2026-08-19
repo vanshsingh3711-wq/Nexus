@@ -1,24 +1,24 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-import { Send, Bot, User, Code, Check, Loader2, ChevronDown, MessageSquare, Plus, RefreshCw, Layers } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Send, User, Code, Check, Loader2, ChevronDown,
+  Sparkles, Layers, Copy, TerminalSquare
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import TextareaAutosize from 'react-textarea-autosize'; // Highly recommended: npm i react-textarea-autosize
 
 interface Repository {
   id: string;
@@ -39,9 +39,9 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     if (scrollAreaRef.current) {
       const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
@@ -57,11 +57,8 @@ export default function ChatPage() {
         const res = await fetch("/api/repositories");
         if (res.ok) {
           const data = await res.json();
-          // Filter out failed repos if needed, but for now show all
           setRepositories(data);
-          
-          // Select the first READY repository by default
-          const readyRepo = data.find((r: Repository) => r.status === "READY");
+          const readyRepo = data.find((r: Repository) => r.status === "READY" || r.status === "Connected");
           if (readyRepo) setSelectedRepo(readyRepo);
         }
       } catch (error) {
@@ -83,23 +80,17 @@ export default function ChatPage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userQuery: userMessage.content,
-          repositoryId: selectedRepo.id,
-        }),
+        body: JSON.stringify({ userQuery: userMessage.content, repositoryId: selectedRepo.id }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        const aiMessage: Message = { role: "assistant", content: data.answer || "No response received." };
-        setMessages((prev) => [...prev, aiMessage]);
+        setMessages((prev) => [...prev, { role: "assistant", content: data.answer || "No response received." }]);
       } else {
         const err = await res.json();
-        const errorMessage: Message = { role: "assistant", content: `**Error:** ${err.error || "Failed to generate answer"}` };
-        setMessages((prev) => [...prev, errorMessage]);
+        setMessages((prev) => [...prev, { role: "assistant", content: `**Error:** ${err.error || "Failed to generate answer"}` }]);
       }
     } catch (error) {
-      console.error("Chat error:", error);
       setMessages((prev) => [...prev, { role: "assistant", content: "**Error:** Failed to connect to the server." }]);
     } finally {
       setIsLoading(false);
@@ -113,155 +104,148 @@ export default function ChatPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "READY": return "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20";
-      case "INDEXING": return "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20";
-      case "FAILED": return "bg-red-500/10 text-red-500 hover:bg-red-500/20";
-      default: return "bg-gray-500/10 text-gray-500";
-    }
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] bg-background/50 backdrop-blur-xl border border-border rounded-xl shadow-2xl overflow-hidden relative">
-      
-      {/* Header */}
-      <div className="h-16 flex items-center justify-between px-6 border-b border-border/40 bg-background/80 z-10">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg text-primary">
-            <MessageSquare className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="font-semibold text-foreground text-sm">Repository Assistant</h1>
-            <p className="text-xs text-muted-foreground hidden sm:block">Ask anything about your codebase</p>
-          </div>
-        </div>
+    <div className="flex flex-col h-full bg-[#09090B] relative font-sans">
 
+      {/* Top Navbar / Header (Mimicking the mockup's top left repo selector) */}
+      <div className="h-14 flex items-center justify-between px-6 border-b border-[#27272A] bg-[#09090B]/80 backdrop-blur-md z-20">
         <div className="flex items-center gap-4">
+          <div className="flex items-center justify-center w-6 h-6 rounded-md bg-[#7C3AED]/20">
+            <Layers className="w-3.5 h-3.5 text-[#7C3AED]" />
+          </div>
+
           {repositories.length > 0 ? (
             <DropdownMenu>
-              <DropdownMenuTrigger className="inline-flex h-9 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-border/50 bg-background/50 px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent/50 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
-                <Layers className="w-4 h-4 text-muted-foreground" />
-                <span className="max-w-[120px] truncate">
-                  {selectedRepo ? selectedRepo.name : "Select Repository"}
-                </span>
-                <ChevronDown className="w-4 h-4 opacity-50" />
+              <DropdownMenuTrigger className="flex items-center gap-2 text-sm font-medium text-[#FAFAFA] hover:text-[#7C3AED] transition-colors outline-none group">
+                {selectedRepo ? selectedRepo.name : "Select Repository"}
+                <ChevronDown className="w-4 h-4 text-[#A1A1AA] group-hover:text-[#7C3AED] transition-colors" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[240px]">
+              <DropdownMenuContent align="start" className="w-[240px] bg-[#18181B] border-[#27272A] text-[#FAFAFA] p-1.5 rounded-xl">
                 {repositories.map((repo) => (
-                  <DropdownMenuItem 
-                    key={repo.id} 
+                  <DropdownMenuItem
+                    key={repo.id}
                     onClick={() => setSelectedRepo(repo)}
-                    className="flex flex-col items-start gap-1 p-2"
+                    className="flex items-center justify-between p-2 rounded-lg focus:bg-[#27272A]/80 cursor-pointer outline-none"
                   >
-                    <div className="flex items-center justify-between w-full">
-                      <span className="font-medium">{repo.name}</span>
-                      {selectedRepo?.id === repo.id && <Check className="w-4 h-4 text-primary" />}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                        {repo.status}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">{repo.owner}</span>
-                    </div>
+                    <span className="text-sm truncate">{repo.name}</span>
+                    {selectedRepo?.id === repo.id && <Check className="w-4 h-4 text-[#7C3AED]" />}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="outline" size="sm" disabled className="h-9">
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Loading Repos...
-            </Button>
+            <span className="text-sm text-[#A1A1AA] flex items-center gap-2">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading context...
+            </span>
           )}
+        </div>
 
-          {selectedRepo && (
-            <Badge variant="outline" className={`px-2 py-0.5 ${getStatusColor(selectedRepo.status)}`}>
-              <span className="flex items-center gap-1.5">
-                {selectedRepo.status === "INDEXING" && <RefreshCw className="w-3 h-3 animate-spin" />}
-                {selectedRepo.status}
-              </span>
-            </Badge>
-          )}
+        {/* Connection Status Indicator */}
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-[#22C55E] shadow-[0_0_8px_rgba(34,197,94,0.5)] animate-pulse" />
+          <span className="text-xs text-[#A1A1AA] font-medium tracking-wide">AI ACTIVE</span>
         </div>
       </div>
 
-      {/* Chat Area */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1 bg-background/20 p-4 sm:p-6">
-        <div className="max-w-4xl mx-auto space-y-6 pb-24">
-          
-          {/* Empty State */}
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 ring-1 ring-primary/20 shadow-inner">
-                <Bot className="w-8 h-8 text-primary" />
-              </div>
-              <h2 className="text-2xl font-semibold text-foreground tracking-tight mb-2">How can I help you?</h2>
-              <p className="text-muted-foreground max-w-[400px] text-sm leading-relaxed mb-8">
-                I'm ready to answer questions, explain code, or help you find specific implementations in your selected repository.
-              </p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-[600px]">
-                {[
-                  "Explain the authentication flow",
-                  "Where is the database schema defined?",
-                  "How are errors handled in the API?",
-                  "Show me the main React components"
-                ].map((prompt, i) => (
-                  <Button 
-                    key={i} 
-                    variant="outline" 
-                    className="h-auto py-3 px-4 justify-start text-left text-sm text-muted-foreground hover:text-foreground border-border/50 bg-background/50 hover:bg-accent/50"
-                    onClick={() => {
-                      setInput(prompt);
-                    }}
-                  >
-                    <Plus className="w-4 h-4 mr-2 opacity-50 flex-shrink-0" />
-                    <span className="truncate">{prompt}</span>
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
+      {/* Main Chat Scroll Area */}
+      <ScrollArea ref={scrollAreaRef} className="flex-1 px-4 sm:px-8 pt-6 pb-32">
+        <div className="max-w-3xl mx-auto space-y-10">
 
-          {/* Messages */}
+          {/* Abstract Empty State (Mimicking the visual nodes from your screenshot) */}
+          <AnimatePresence>
+            {messages.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center pt-20 pb-10"
+              >
+                {/* Node Graph CSS Art */}
+                <div className="relative w-64 h-64 flex items-center justify-center mb-8 pointer-events-none">
+                  <div className="absolute inset-0 border border-[#27272A] rounded-full animate-[spin_20s_linear_infinite]" />
+                  <div className="absolute inset-4 border border-[#27272A]/50 rounded-full border-dashed animate-[spin_15s_linear_infinite_reverse]" />
+
+                  {/* Surrounding Nodes */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#3B82F6] rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-3 h-3 bg-[#F59E0B] rounded-full shadow-[0_0_15px_rgba(245,158,11,0.5)]" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 bg-[#22C55E] rounded-full shadow-[0_0_15px_rgba(34,197,94,0.5)]" />
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-3 h-3 bg-[#EC4899] rounded-full shadow-[0_0_15px_rgba(236,72,153,0.5)]" />
+
+                  {/* Center Nexus Node */}
+                  <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(124,58,237,0.4)]">
+                    <span className="text-white font-bold text-xl">N</span>
+                  </div>
+                </div>
+
+                <h2 className="text-2xl font-semibold text-[#FAFAFA] tracking-tight mb-2">Nexus Intelligence</h2>
+                <p className="text-[#A1A1AA] text-sm text-center max-w-md">
+                  I have analyzed your codebase structure. Ask me anything about components, database schemas, or routing logic.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* IDE-Style Threaded Messages */}
           {messages.map((msg, idx) => (
-            <div 
-              key={idx} 
-              className={`flex gap-4 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`flex gap-4 group ${msg.role === "user" ? "text-[#A1A1AA]" : "text-[#FAFAFA]"}`}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                msg.role === "user" 
-                  ? "bg-primary text-primary-foreground shadow-sm" 
-                  : "bg-muted text-muted-foreground border border-border"
-              }`}>
-                {msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+              {/* Avatar Column */}
+              <div className="flex-shrink-0 mt-1">
+                {msg.role === "user" ? (
+                  <div className="w-6 h-6 rounded bg-[#27272A] flex items-center justify-center">
+                    <User className="w-3.5 h-3.5 text-[#FAFAFA]" />
+                  </div>
+                ) : (
+                  <div className="w-6 h-6 rounded bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center shadow-[0_0_10px_rgba(124,58,237,0.3)]">
+                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                  </div>
+                )}
               </div>
-              
-              <div className={`flex-1 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] rounded-2xl px-5 py-3.5 text-sm leading-relaxed shadow-sm ${
-                  msg.role === "user" 
-                    ? "bg-primary text-primary-foreground" 
-                    : "bg-card border border-border/50 text-card-foreground prose prose-invert prose-sm max-w-none"
-                }`}>
-                  {msg.role === "user" ? (
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
-                  ) : (
+
+              {/* Content Column */}
+              <div className="flex-1 min-w-0 space-y-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-semibold text-[#FAFAFA]">
+                    {msg.role === "user" ? "You" : "Nexus AI"}
+                  </span>
+                </div>
+
+                {msg.role === "user" ? (
+                  <div className="text-sm font-medium leading-relaxed">
+                    {msg.content}
+                  </div>
+                ) : (
+                  <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:p-0 prose-pre:bg-transparent prose-pre:my-6 prose-a:text-[#7C3AED] prose-a:no-underline hover:prose-a:underline">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
                         code({ node, inline, className, children, ...props }: any) {
                           const match = /language-(\w+)/.exec(className || "");
+                          const codeString = String(children).replace(/\n$/, "");
+                          const isCopied = copiedCode === codeString;
+
                           return !inline && match ? (
-                            <div className="relative group mt-4 mb-4 rounded-lg overflow-hidden border border-border/50">
-                              <div className="flex items-center justify-between px-4 py-1.5 bg-[#1e1e1e] border-b border-[#2d2d2d]">
-                                <span className="text-xs text-zinc-400 font-mono lowercase">{match[1]}</span>
-                                <button 
-                                  onClick={() => navigator.clipboard.writeText(String(children).replace(/\n$/, ""))}
-                                  className="text-zinc-500 hover:text-zinc-300 transition-colors"
-                                  title="Copy code"
+                            <div className="rounded-xl overflow-hidden border border-[#27272A] bg-[#09090B] my-4 shadow-lg">
+                              <div className="flex items-center justify-between px-4 py-2 bg-[#18181B] border-b border-[#27272A]">
+                                <div className="flex items-center gap-2">
+                                  <TerminalSquare className="w-4 h-4 text-[#A1A1AA]" />
+                                  <span className="text-xs text-[#A1A1AA] font-mono lowercase">{match[1]}</span>
+                                </div>
+                                <button
+                                  onClick={() => handleCopyCode(codeString)}
+                                  className="text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors"
                                 >
-                                  <Code className="w-3.5 h-3.5" />
+                                  {isCopied ? <Check className="w-3.5 h-3.5 text-[#22C55E]" /> : <Copy className="w-3.5 h-3.5" />}
                                 </button>
                               </div>
                               <SyntaxHighlighter
@@ -269,86 +253,76 @@ export default function ChatPage() {
                                 style={vscDarkPlus}
                                 language={match[1]}
                                 PreTag="div"
-                                customStyle={{ margin: 0, padding: "1rem", backgroundColor: "#1e1e1e" }}
-                                codeTagProps={{ className: "text-sm font-mono" }}
+                                customStyle={{ margin: 0, padding: "1.25rem", backgroundColor: "transparent" }}
+                                codeTagProps={{ className: "text-sm font-mono leading-relaxed" }}
                               >
-                                {String(children).replace(/\n$/, "")}
+                                {codeString}
                               </SyntaxHighlighter>
                             </div>
                           ) : (
-                            <code {...props} className="bg-muted px-1.5 py-0.5 rounded-md font-mono text-xs text-primary/90">
+                            <code {...props} className="bg-[#27272A]/50 px-1.5 py-0.5 rounded text-[#7C3AED] font-mono text-[13px] border border-[#27272A]">
                               {children}
                             </code>
                           );
-                        },
+                        }
                       }}
                     >
                       {msg.content}
                     </ReactMarkdown>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
-            </div>
+            </motion.div>
           ))}
 
+          {/* Typing Indicator */}
           {isLoading && (
-            <div className="flex gap-4 flex-row animate-in fade-in slide-in-from-bottom-2 duration-300">
-               <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-muted text-muted-foreground border border-border">
-                <Bot className="w-4 h-4" />
-              </div>
-              <div className="bg-card border border-border/50 text-card-foreground rounded-2xl px-5 py-4 shadow-sm flex items-center gap-2">
-                <div className="flex gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "300ms" }} />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-6 h-6 rounded bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center shadow-[0_0_10px_rgba(124,58,237,0.3)]">
+                  <Sparkles className="w-3.5 h-3.5 text-white" />
                 </div>
               </div>
-            </div>
+              <div className="flex-1 flex items-center gap-1.5 h-8">
+                <span className="text-xs text-[#7C3AED] font-medium mr-2">Nexus is typing</span>
+                <motion.div className="w-1.5 h-1.5 rounded-full bg-[#7C3AED]" animate={{ y: [0, -4, 0], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1, repeat: Infinity, delay: 0 }} />
+                <motion.div className="w-1.5 h-1.5 rounded-full bg-[#7C3AED]" animate={{ y: [0, -4, 0], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }} />
+                <motion.div className="w-1.5 h-1.5 rounded-full bg-[#7C3AED]" animate={{ y: [0, -4, 0], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1, repeat: Infinity, delay: 0.4 }} />
+              </div>
+            </motion.div>
           )}
         </div>
       </ScrollArea>
 
-      {/* Input Area */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-t from-background via-background/95 to-transparent z-20">
-        <div className="max-w-4xl mx-auto relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition duration-500" />
-          <div className="relative flex items-end gap-2 bg-background border border-border shadow-lg rounded-xl overflow-hidden focus-within:ring-1 focus-within:ring-primary/50 transition-all duration-300 p-2">
-            
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={selectedRepo ? `Ask about ${selectedRepo.name}...` : "Select a repository to start chatting"}
-              disabled={!selectedRepo || isLoading}
-              className="min-h-[52px] max-h-[200px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent py-3 px-3 text-sm leading-relaxed"
-              rows={1}
-            />
-            
-            <div className="flex-shrink-0 flex items-center mb-1 mr-1">
-              <Button 
-                size="icon" 
-                className={`w-10 h-10 rounded-lg transition-all ${input.trim() ? "bg-primary text-primary-foreground shadow-md hover:bg-primary/90" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-                disabled={!input.trim() || !selectedRepo || isLoading}
-                onClick={handleSend}
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Send className="w-4 h-4 ml-0.5" />
-                )}
-              </Button>
-            </div>
-            
-          </div>
-          <div className="flex justify-center mt-2 opacity-50">
-            <span className="text-[10px] text-muted-foreground flex items-center gap-1 font-medium">
-              <span className="border border-border rounded px-1 py-0.5 bg-background shadow-sm">Enter</span> to send, 
-              <span className="border border-border rounded px-1 py-0.5 bg-background shadow-sm">Shift + Enter</span> for new line
-            </span>
-          </div>
+      {/* Floating Command Bar Input */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 z-30">
+        <div className="relative group flex items-end gap-2 bg-[#18181B]/90 backdrop-blur-xl border border-[#27272A] p-2 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] focus-within:border-[#7C3AED]/50 transition-all duration-300">
+
+          <TextareaAutosize
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={selectedRepo ? "Ask anything..." : "Select a repository to chat"}
+            disabled={!selectedRepo || isLoading}
+            maxRows={8}
+            className="w-full resize-none border-0 bg-transparent py-3 px-3 text-sm text-[#FAFAFA] placeholder:text-[#A1A1AA] outline-none focus:ring-0 leading-relaxed"
+          />
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl transition-colors ${input.trim() && selectedRepo && !isLoading
+              ? "bg-[#7C3AED] text-white shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:bg-[#6D28D9]"
+              : "bg-[#27272A] text-[#A1A1AA] cursor-not-allowed"
+              }`}
+            disabled={!input.trim() || !selectedRepo || isLoading}
+            onClick={handleSend}
+          >
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 ml-0.5" />}
+          </motion.button>
         </div>
       </div>
-      
+
     </div>
   );
 }
