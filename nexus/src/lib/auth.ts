@@ -2,11 +2,11 @@ import { betterAuth } from "better-auth";
 import { prisma } from "@/lib/prisma";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 
-
 export const auth = betterAuth({
+  baseURL: "https://nexus-iota-liart.vercel.app",
+
   trustedOrigins: [
-    "http://localhost:3000",
-    "https://nexus-4rkkcqiu-wansh-singh.vercel.app",
+    "https://nexus-iota-liart.vercel.app",
   ],
 
   database: prismaAdapter(prisma, {
